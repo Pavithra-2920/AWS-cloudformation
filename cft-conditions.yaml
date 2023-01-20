@@ -1,0 +1,36 @@
+Description:
+  AWS CloudFormation sample template.
+
+Parameters:
+ Productionenvironment:
+  Description: Environment type
+  Default: dev
+  Type: String
+  AllowedValues: 
+     - Prod
+     - Dev
+  ConstraintDescription: Must specify 'dev', or 'prod'
+
+Mappings: 
+  mapRegion:
+    us-east-1:
+      AMI: ami-0fe472d8a85bc7b0e
+    ap-south-1:
+      AMI: ami-0cca134ec43cf708f
+
+Conditions:
+  isProd: !Equals [!Ref Productionenvironment, prod] 
+  isDev: !Equals [!Ref Productionenvironment, dev] 
+
+
+Resources:
+  Main-ec2:
+   Type: AWS::EC2::Instance
+      Properties:
+      ImageId: !FindInMap
+        - mapRegion 
+        - !Ref 'AWS::Region' 
+        - AMI
+      InstanceType: !If [isProd, t2.micro,!If [isDev, t2.nano]]
+      
+   
